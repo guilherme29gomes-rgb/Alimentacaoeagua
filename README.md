@@ -32,7 +32,13 @@ No celular, use **"Adicionar à tela inicial"** para instalar como aplicativo (f
 O app é empacotado com [Capacitor](https://capacitorjs.com). No APK os lembretes são **notificações nativas agendadas**
 (água e refeições para os próximos 5 dias, renovadas sempre que você abre o app), então chegam **mesmo com o app fechado**.
 
-### Baixar o APK pronto (GitHub Actions)
+### Baixar o APK
+
+**Link direto:** https://github.com/guilherme29gomes-rgb/Alimentacaoeagua/releases/download/apk/HidraFit.apk
+
+(É atualizado automaticamente a cada nova versão no branch principal.)
+
+### Ou pelo GitHub Actions
 
 A cada push, o workflow **"Gerar APK Android"** compila o app:
 

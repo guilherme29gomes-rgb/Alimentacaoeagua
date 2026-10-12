@@ -5,6 +5,9 @@ on:
     branches: ['**']
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   apk:
     runs-on: ubuntu-latest
@@ -52,3 +55,16 @@ jobs:
           name: HidraFit-apk
           path: HidraFit.apk
           retention-days: 30
+
+      # Link fixo para baixar direto no celular:
+      # https://github.com/<dono>/<repo>/releases/download/apk/HidraFit.apk
+      - name: Publicar link de download
+        if: github.ref_name == github.event.repository.default_branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view apk >/dev/null 2>&1 || gh release create apk \
+            --title "HidraFit — APK mais recente" \
+            --notes "Baixe o HidraFit.apk abaixo e abra no celular Android. Atualizado automaticamente a cada nova versão." \
+            --target "$GITHUB_SHA"
+          gh release upload apk HidraFit.apk --clobber
