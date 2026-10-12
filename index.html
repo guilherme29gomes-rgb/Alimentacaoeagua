@@ -109,7 +109,11 @@
         </label>
         <label class="check"><input type="checkbox" name="noLactose"> Sem lactose</label>
         <div class="field">
-          <span class="field-label">Alimentos que você NÃO quer no plano</span>
+          <span class="field-label">❤️ Alimentos que você mais gosta (aparecem mais vezes)</span>
+          <div class="chips fav" id="ob-favorites"></div>
+        </div>
+        <div class="field">
+          <span class="field-label">🚫 Alimentos que você NÃO quer no plano</span>
           <div class="chips" id="ob-exclude"></div>
         </div>
         <label class="check"><input type="checkbox" name="reminders" checked> Quero lembretes de água e refeições</label>
@@ -161,6 +165,11 @@
           </form>
         </div>
 
+        <button class="card protein-card mini" id="prot-mini-card" type="button" aria-label="Abrir contador de proteína">
+          <div class="card-title"><h2>💪 Proteína de hoje</h2><span class="tag">ver refeições ›</span></div>
+          <div id="prot-mini"></div>
+        </button>
+
         <div class="card">
           <div class="card-title">
             <h2>Como sua meta foi calculada</h2>
@@ -177,6 +186,11 @@
 
       <!-- ALIMENTAÇÃO -->
       <div class="tab hidden" id="tab-dieta">
+        <div class="card protein-card">
+          <div class="card-title"><h2>💪 Contador de proteína</h2></div>
+          <div id="prot-counter"></div>
+        </div>
+
         <div class="card">
           <div class="card-title"><h2>Meta diária</h2><span class="tag" id="diet-daytype"></span></div>
           <div class="macros" id="macro-targets"></div>

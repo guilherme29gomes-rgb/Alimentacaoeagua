@@ -90,7 +90,10 @@ label.check input { width: 1.15rem; height: 1.15rem; accent-color: var(--primary
 .seg input:checked + span, .days input:checked + span {
   background: var(--primary); border-color: var(--primary); color: #fff;
 }
-.chips input:checked + span {
+.chips.fav input:checked + span {
+  background: var(--green); border-color: var(--green); color: #fff; text-decoration: none;
+}
+.chips:not(.fav) input:checked + span {
   background: var(--red); border-color: var(--red); color: #fff; text-decoration: line-through;
 }
 .seg input:focus-visible + span, .days input:focus-visible + span, .chips input:focus-visible + span {
@@ -190,6 +193,33 @@ main { padding: 0 1rem; }
 .foods .qty { color: var(--muted); white-space: nowrap; }
 .meal-foot { display: flex; justify-content: space-between; align-items: center; gap: .5rem; font-size: .8rem; color: var(--muted); flex-wrap: wrap; }
 .meal-foot b.p { color: var(--p); } .meal-foot b.c { color: var(--c); } .meal-foot b.f { color: var(--f); }
+/* Itens da refeição com confirmação */
+.foods li { padding: 0; }
+.foods li label { display: flex; align-items: center; gap: .55rem; width: 100%; margin: 0; padding: .4rem 0; color: var(--text); cursor: pointer; font-size: .92rem; }
+.food-check { width: 1.25rem; height: 1.25rem; flex: 0 0 auto; accent-color: var(--green); }
+.foods .fname { flex: 1; }
+.foods .fname em { font-style: normal; font-size: .7rem; font-weight: 700; color: var(--orange); background: rgba(232,137,12,.12); border-radius: 999px; padding: .05rem .45rem; margin-left: .4rem; white-space: nowrap; }
+.foods .qty { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
+.foods .qty b.p { color: var(--p); font-size: .72rem; }
+.foods li.ate .fname { text-decoration: line-through; color: var(--muted); }
+.foods li.pending .fname { color: var(--text); }
+
+/* Contador de proteína */
+.protein-card { border-top: 4px solid var(--p); }
+.protein-card.mini { display: block; width: 100%; text-align: left; border-left: 0; border-right: 0; border-bottom: 0; font: inherit; color: inherit; cursor: pointer; }
+.prot-big { display: flex; align-items: baseline; gap: .4rem; margin: .3rem 0 .5rem; }
+.prot-big strong { font-size: 2.2rem; color: var(--p); line-height: 1; }
+.prot-big span { color: var(--muted); }
+.track.big { height: 12px; background: var(--bg); border-radius: 6px; overflow: hidden; }
+.track.big .fill { height: 100%; background: var(--p); border-radius: 6px; transition: width .5s; }
+.prot-status { margin: .5rem 0 .2rem; font-size: .92rem; }
+.prot-status .warn { color: var(--orange); font-weight: 600; }
+.pend-list { list-style: none; padding: 0; margin: .3rem 0 0; display: grid; gap: .4rem; }
+.pend-btn { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: .5rem; text-align: left;
+  border: 1px dashed var(--orange); background: transparent; color: var(--text); border-radius: 10px; padding: .55rem .7rem; font: inherit; font-size: .88rem; cursor: pointer; }
+.pend-btn small { display: block; color: var(--muted); font-size: .75rem; }
+.pend-btn b { color: var(--green); white-space: nowrap; }
+
 .tips ul { padding-left: 1.1rem; margin: .4rem 0 0; }
 .tips li { margin: .35rem 0; font-size: .92rem; }
 

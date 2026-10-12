@@ -1,5 +1,5 @@
 /* Service worker: funciona offline e exibe as notificações de lembrete. */
-const CACHE = 'hidrafit-v1';
+const CACHE = 'hidrafit-v2';
 const ASSETS = ['./', 'index.html', 'styles.css', 'app.js', 'manifest.webmanifest', 'icon.svg'];
 
 self.addEventListener('install', e => {
