@@ -1,0 +1,15 @@
+{
+  "name": "HidraFit — Água e Nutrição",
+  "short_name": "HidraFit",
+  "description": "Monitore sua hidratação e siga um plano alimentar para ganho de massa magra.",
+  "lang": "pt-BR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f2f6fa",
+  "theme_color": "#0b84d8",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

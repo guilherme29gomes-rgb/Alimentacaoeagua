@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b84d8">
+  <meta name="description" content="Monitore sua hidratação e receba um plano alimentar personalizado para ganho de massa magra.">
+  <title>HidraFit</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- ===================== ONBOARDING ===================== -->
+  <section id="onboarding" class="screen hidden" aria-label="Cadastro">
+    <header class="ob-header">
+      <img src="icon.svg" alt="" width="48" height="48">
+      <h1>HidraFit</h1>
+      <p>Água + nutrição para ganhar massa magra</p>
+      <div class="steps" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+    </header>
+
+    <form id="ob-form" novalidate>
+      <!-- Passo 1 -->
+      <fieldset class="ob-step" data-step="0">
+        <legend>Sobre você</legend>
+        <label>Nome
+          <input name="name" type="text" autocomplete="given-name" placeholder="Como podemos te chamar?" required>
+        </label>
+        <div class="field">
+          <span class="field-label">Gênero</span>
+          <div class="seg">
+            <label><input type="radio" name="gender" value="m" required><span>Masculino</span></label>
+            <label><input type="radio" name="gender" value="f"><span>Feminino</span></label>
+          </div>
+        </div>
+        <label>Idade
+          <input name="age" type="number" inputmode="numeric" min="14" max="100" placeholder="anos" required>
+        </label>
+      </fieldset>
+
+      <!-- Passo 2 -->
+      <fieldset class="ob-step" data-step="1">
+        <legend>Corpo e objetivo</legend>
+        <div class="row">
+          <label>Peso (kg)
+            <input name="weight" type="number" inputmode="decimal" step="0.1" min="30" max="300" placeholder="ex: 72.5" required>
+          </label>
+          <label>Altura (cm)
+            <input name="height" type="number" inputmode="numeric" min="120" max="230" placeholder="ex: 175" required>
+          </label>
+        </div>
+        <label>Como é seu dia a dia (fora do treino)?
+          <select name="activity" required>
+            <option value="sed">Sedentário — trabalho sentado, pouco movimento</option>
+            <option value="leve" selected>Levemente ativo — anda um pouco, fica em pé às vezes</option>
+            <option value="ativo">Ativo — trabalho em pé / caminha bastante</option>
+            <option value="muito">Muito ativo — trabalho físico pesado</option>
+          </select>
+        </label>
+        <div class="field">
+          <span class="field-label">Ritmo do ganho de massa</span>
+          <div class="seg">
+            <label><input type="radio" name="surplus" value="leve" checked><span>Limpo (menos gordura)</span></label>
+            <label><input type="radio" name="surplus" value="moderado"><span>Moderado (mais rápido)</span></label>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Passo 3 -->
+      <fieldset class="ob-step" data-step="2">
+        <legend>Sua rotina</legend>
+        <div class="row">
+          <label>Acordo às <input name="wake" type="time" value="06:30" required></label>
+          <label>Durmo às <input name="sleep" type="time" value="23:00" required></label>
+        </div>
+        <div class="row">
+          <label>Almoço às <input name="lunch" type="time" value="12:30" required></label>
+          <label>Jantar às <input name="dinner" type="time" value="19:30" required></label>
+        </div>
+        <div class="field">
+          <span class="field-label">Dias de treino</span>
+          <div class="days" id="ob-days">
+            <label><input type="checkbox" name="trainDays" value="1"><span>Seg</span></label>
+            <label><input type="checkbox" name="trainDays" value="2"><span>Ter</span></label>
+            <label><input type="checkbox" name="trainDays" value="3"><span>Qua</span></label>
+            <label><input type="checkbox" name="trainDays" value="4"><span>Qui</span></label>
+            <label><input type="checkbox" name="trainDays" value="5"><span>Sex</span></label>
+            <label><input type="checkbox" name="trainDays" value="6"><span>Sáb</span></label>
+            <label><input type="checkbox" name="trainDays" value="0"><span>Dom</span></label>
+          </div>
+        </div>
+        <div class="row">
+          <label>Horário do treino <input name="trainTime" type="time" value="18:00"></label>
+          <label>Duração (min) <input name="trainDuration" type="number" inputmode="numeric" min="15" max="240" value="60"></label>
+        </div>
+      </fieldset>
+
+      <!-- Passo 4 -->
+      <fieldset class="ob-step" data-step="3">
+        <legend>Preferências alimentares</legend>
+        <label>Tipo de alimentação
+          <select name="diet">
+            <option value="onivoro">Como de tudo</option>
+            <option value="vegetariano">Vegetariano (ovos e laticínios ok)</option>
+            <option value="vegano">Vegano</option>
+          </select>
+        </label>
+        <label class="check"><input type="checkbox" name="noLactose"> Sem lactose</label>
+        <div class="field">
+          <span class="field-label">Alimentos que você NÃO quer no plano</span>
+          <div class="chips" id="ob-exclude"></div>
+        </div>
+        <label class="check"><input type="checkbox" name="reminders" checked> Quero lembretes de água e refeições</label>
+      </fieldset>
+
+      <p class="ob-error" id="ob-error" role="alert"></p>
+      <div class="ob-nav">
+        <button type="button" class="btn ghost" id="ob-back">Voltar</button>
+        <button type="button" class="btn primary" id="ob-next">Próximo</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ===================== APP ===================== -->
+  <section id="app" class="screen hidden">
+    <header class="topbar">
+      <div>
+        <p class="hello" id="hello">Olá!</p>
+        <p class="date" id="today-label"></p>
+      </div>
+      <button class="day-badge" id="day-type" title="Alternar dia de treino / descanso"></button>
+    </header>
+
+    <main>
+      <!-- ÁGUA -->
+      <div class="tab" id="tab-agua">
+        <div class="card water-card">
+          <div class="ring-wrap">
+            <svg viewBox="0 0 200 200" class="ring" aria-hidden="true">
+              <circle cx="100" cy="100" r="86" class="ring-bg"/>
+              <circle cx="100" cy="100" r="86" class="ring-fg" id="ring-fg"/>
+            </svg>
+            <div class="ring-center">
+              <span class="drop" id="drop">💧</span>
+              <strong id="water-total">0 ml</strong>
+              <span id="water-goal">de 0 ml</span>
+              <span class="pct" id="water-pct">0%</span>
+            </div>
+          </div>
+          <p class="pace" id="water-pace"></p>
+          <div class="quick">
+            <button class="btn water" data-ml="200">+200 ml<small>copo</small></button>
+            <button class="btn water" data-ml="300">+300 ml<small>copo grande</small></button>
+            <button class="btn water" data-ml="500">+500 ml<small>garrafinha</small></button>
+          </div>
+          <form class="custom" id="custom-water">
+            <input type="number" inputmode="numeric" min="10" max="2000" placeholder="Outra quantidade (ml)" aria-label="Quantidade em ml">
+            <button class="btn primary" type="submit">Adicionar</button>
+          </form>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <h2>Como sua meta foi calculada</h2>
+          </div>
+          <p class="muted" id="water-explain"></p>
+          <p class="muted" id="next-reminder"></p>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><h2>Registros de hoje</h2></div>
+          <ul class="log" id="water-log"></ul>
+        </div>
+      </div>
+
+      <!-- ALIMENTAÇÃO -->
+      <div class="tab hidden" id="tab-dieta">
+        <div class="card">
+          <div class="card-title"><h2>Meta diária</h2><span class="tag" id="diet-daytype"></span></div>
+          <div class="macros" id="macro-targets"></div>
+          <div class="bar-group" id="macro-progress"></div>
+          <p class="muted small" id="diet-explain"></p>
+        </div>
+
+        <div id="meal-list"></div>
+
+        <div class="card tips">
+          <div class="card-title"><h2>Dicas para ganhar músculo sem muita gordura</h2></div>
+          <ul>
+            <li><b>Superávit pequeno:</b> ganhar ~0,25–0,5% do peso por semana. Mais que isso costuma virar gordura.</li>
+            <li><b>Proteína em todas as refeições</b> (20–40 g), distribuída ao longo do dia.</li>
+            <li><b>Treino de força progressivo</b> é o que manda o corpo construir músculo — a dieta só fornece o material.</li>
+            <li><b>Durma 7–9 h.</b> É no sono que acontece boa parte da recuperação.</li>
+            <li><b>Pese-se 1x por semana</b>, mesmo dia e horário. Se não subir em 2 semanas, aumente ~150 kcal; se subir rápido demais, reduza.</li>
+            <li>Prefira comida de verdade; o whey é só praticidade, não obrigação.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- PROGRESSO -->
+      <div class="tab hidden" id="tab-progresso">
+        <div class="card">
+          <div class="card-title"><h2>Água — últimos 7 dias</h2><span class="tag" id="streak"></span></div>
+          <div class="chart" id="water-chart"></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><h2>Refeições cumpridas</h2></div>
+          <div class="chart" id="meal-chart"></div>
+        </div>
+        <div class="card">
+          <div class="card-title"><h2>Peso</h2></div>
+          <form class="custom" id="weight-form">
+            <input type="number" inputmode="decimal" step="0.1" min="30" max="300" placeholder="Peso de hoje (kg)" aria-label="Peso em kg">
+            <button class="btn primary" type="submit">Registrar</button>
+          </form>
+          <p class="muted small" id="weight-trend"></p>
+          <ul class="log" id="weight-log"></ul>
+        </div>
+      </div>
+
+      <!-- PERFIL -->
+      <div class="tab hidden" id="tab-perfil">
+        <div class="card">
+          <div class="card-title"><h2>Seu perfil</h2><button class="btn small ghost" id="edit-profile">Editar</button></div>
+          <dl class="profile" id="profile-data"></dl>
+        </div>
+        <div class="card">
+          <div class="card-title"><h2>Lembretes</h2></div>
+          <label class="check"><input type="checkbox" id="set-water-rem"> Lembrar de beber água</label>
+          <label>Intervalo dos lembretes de água
+            <select id="set-interval">
+              <option value="auto">Automático (pela meta)</option>
+              <option value="30">A cada 30 min</option>
+              <option value="45">A cada 45 min</option>
+              <option value="60">A cada 1 h</option>
+              <option value="90">A cada 1 h 30</option>
+              <option value="120">A cada 2 h</option>
+            </select>
+          </label>
+          <label class="check"><input type="checkbox" id="set-meal-rem"> Avisar no horário das refeições</label>
+          <p class="muted small" id="notif-status"></p>
+          <div class="btn-row">
+            <button class="btn primary" id="enable-notif">Ativar notificações</button>
+            <button class="btn ghost" id="test-notif">Testar aviso</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><h2>Dados</h2></div>
+          <p class="muted small">Tudo fica salvo só neste aparelho.</p>
+          <div class="btn-row">
+            <button class="btn ghost" id="export-data">Exportar backup</button>
+            <button class="btn danger" id="reset-data">Apagar tudo</button>
+          </div>
+        </div>
+        <p class="disclaimer">O HidraFit dá recomendações gerais baseadas em fórmulas científicas (Mifflin-St Jeor, ~35 ml/kg de água, 1,8–2,2 g/kg de proteína). Não substitui a avaliação de um nutricionista ou médico — principalmente se você tiver alguma condição de saúde.</p>
+      </div>
+    </main>
+
+    <nav class="tabbar" aria-label="Seções">
+      <button data-tab="agua" class="active"><span>💧</span>Água</button>
+      <button data-tab="dieta"><span>🍽️</span>Alimentação</button>
+      <button data-tab="progresso"><span>📈</span>Progresso</button>
+      <button data-tab="perfil"><span>👤</span>Perfil</button>
+    </nav>
+  </section>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
