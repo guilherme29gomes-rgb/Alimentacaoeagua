@@ -18,8 +18,8 @@
   color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
+/* Tema escuro: só quando escolhido no Perfil (o padrão é claro) */
+:root[data-theme="dark"] {
     --bg: #0d1620;
     --card: #15212d;
     --text: #e8eef4;
@@ -30,7 +30,6 @@
     --shadow: none;
     color-scheme: dark;
   }
-}
 
 * { box-sizing: border-box; }
 html, body { margin: 0; }
@@ -273,3 +272,48 @@ main { padding: 0 1rem; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* Treino na lista de refeições */
+.train-card { display: flex; flex-direction: column; gap: .15rem; margin: .8rem 0; padding: .75rem 1rem; border-radius: var(--radius);
+  background: var(--primary); color: #fff; font-size: .95rem; }
+.train-card span { font-size: .82rem; opacity: .9; }
+.train-card.rest { background: var(--card); color: var(--text); border: 1px dashed var(--line); }
+
+/* Trocar alimento */
+.foods li { display: flex; align-items: center; gap: .2rem; }
+.foods li label { flex: 1; min-width: 0; }
+.edit-food { border: 0; background: var(--bg); border-radius: 8px; padding: .35rem .45rem; cursor: pointer; font-size: .9rem; flex: 0 0 auto; }
+.foods .fname em.info { color: var(--primary); background: var(--primary-soft); }
+.add-food { width: 100%; margin: .3rem 0 .5rem; border: 1px dashed var(--line); background: transparent; color: var(--primary);
+  border-radius: 10px; padding: .5rem; font: inherit; font-size: .85rem; font-weight: 600; cursor: pointer; }
+.btn.wide { width: 100%; margin-top: .4rem; }
+
+.picker { border: 0; border-radius: 18px 18px 0 0; padding: 1rem; width: 100%; max-width: 620px; max-height: 88vh;
+  margin: auto auto 0; background: var(--card); color: var(--text); overflow-y: auto; }
+.picker::backdrop { background: rgba(0, 0, 0, .45); }
+.picker[open] { animation: up .2s ease; }
+@keyframes up { from { transform: translateY(40px); opacity: 0; } }
+.pk-head { display: flex; justify-content: space-between; gap: .5rem; align-items: flex-start; }
+.pk-head p { margin: .2rem 0 .6rem; }
+.pk-x { border: 0; background: var(--bg); color: var(--text); border-radius: 50%; width: 2rem; height: 2rem; cursor: pointer; flex: 0 0 auto; }
+.picker input[type=search] { display: block; width: 100%; padding: .65rem .8rem; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--bg); color: var(--text); font: inherit; }
+.pk-groups { display: flex; gap: .35rem; overflow-x: auto; padding: .6rem 0; scrollbar-width: none; }
+.pk-groups button { flex: 0 0 auto; border: 1px solid var(--line); background: var(--card); color: var(--text); border-radius: 999px;
+  padding: .35rem .7rem; font: inherit; font-size: .8rem; cursor: pointer; white-space: nowrap; }
+.pk-groups button.on { background: var(--primary); border-color: var(--primary); color: #fff; }
+.pk-list { list-style: none; padding: 0; margin: 0; max-height: 34vh; overflow-y: auto; border: 1px solid var(--line); border-radius: 12px; }
+.pk-list li + li { border-top: 1px solid var(--line); }
+.pk-list button { width: 100%; text-align: left; border: 0; background: transparent; color: var(--text); padding: .55rem .75rem;
+  font: inherit; font-size: .9rem; cursor: pointer; display: flex; flex-direction: column; }
+.pk-list button small { color: var(--p); font-size: .75rem; }
+.pk-list button.on { background: var(--primary-soft); }
+.pk-list .muted { padding: .8rem; }
+.pk-selected { margin-top: .7rem; padding: .7rem; border-radius: 12px; background: var(--bg); }
+.pk-selected .custom { margin: 0; align-items: center; }
+.pk-unit { color: var(--muted); font-size: .9rem; white-space: nowrap; }
+.pk-selected b.p { color: var(--p); }
+.pk-custom { margin-top: .7rem; font-size: .9rem; }
+.pk-custom summary { cursor: pointer; color: var(--primary); font-weight: 600; padding: .3rem 0; }
+.pk-custom input { display: block; width: 100%; margin-top: .4rem; padding: .6rem .7rem; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--card); color: var(--text); font: inherit; }

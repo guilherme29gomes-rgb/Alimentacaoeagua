@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -241,6 +241,13 @@
           <dl class="profile" id="profile-data"></dl>
         </div>
         <div class="card">
+          <div class="card-title"><h2>Aparência</h2></div>
+          <div class="seg" id="theme-seg">
+            <label><input type="radio" name="theme" value="claro" checked><span>☀️ Claro</span></label>
+            <label><input type="radio" name="theme" value="escuro"><span>🌙 Escuro</span></label>
+          </div>
+        </div>
+        <div class="card">
           <div class="card-title"><h2>Lembretes</h2></div>
           <label class="check"><input type="checkbox" id="set-water-rem"> Lembrar de beber água</label>
           <label>Intervalo dos lembretes de água
@@ -279,6 +286,39 @@
       <button data-tab="perfil"><span>👤</span>Perfil</button>
     </nav>
   </section>
+
+  <!-- Trocar / adicionar alimento -->
+  <dialog id="picker" class="picker" aria-labelledby="pk-title">
+    <div class="pk-head">
+      <div><h2 id="pk-title">Trocar alimento</h2><p class="small muted" id="pk-sub"></p></div>
+      <button class="pk-x" id="pk-close" aria-label="Fechar">✕</button>
+    </div>
+    <input type="search" id="pk-search" placeholder="🔎 Buscar alimento (ex.: carne, queijo, pizza)" aria-label="Buscar alimento">
+    <div class="pk-groups" id="pk-groups"></div>
+    <ul class="pk-list" id="pk-list"></ul>
+    <div class="pk-selected hidden" id="pk-selected">
+      <div class="custom">
+        <input type="number" id="pk-qty" inputmode="decimal" min="0" aria-label="Quantidade">
+        <span class="pk-unit" id="pk-unit">gramas</span>
+      </div>
+      <p class="small" id="pk-preview"></p>
+      <label class="check"><input type="checkbox" id="pk-ate" checked> Já comi</label>
+      <button class="btn primary wide" id="pk-save">Salvar</button>
+    </div>
+    <details class="pk-custom">
+      <summary>Outro alimento (digitar)</summary>
+      <input type="text" id="pk-c-name" placeholder="Nome (ex.: marmita do restaurante)" aria-label="Nome do alimento">
+      <div class="row">
+        <input type="number" id="pk-c-prot" inputmode="decimal" placeholder="Proteína (g)" aria-label="Proteína em gramas">
+        <input type="number" id="pk-c-kcal" inputmode="decimal" placeholder="Calorias (opcional)" aria-label="Calorias">
+      </div>
+      <button class="btn primary wide" id="pk-custom-save">Salvar alimento</button>
+    </details>
+    <div class="btn-row">
+      <button class="btn ghost hidden" id="pk-reset">↩️ Voltar ao sugerido</button>
+      <button class="btn danger hidden" id="pk-remove">🗑️ Remover</button>
+    </div>
+  </dialog>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="confetti" id="confetti" aria-hidden="true"></div>

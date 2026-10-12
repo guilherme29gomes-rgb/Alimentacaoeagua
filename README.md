@@ -11,6 +11,10 @@ Aplicativo (PWA) que:
   - **monta os horários das refeições** pela sua rotina (café, lanches a cada ~3 h, almoço, jantar, ceia, pré e pós-treino);
   - **monta o cardápio com quantidades em gramas** para bater as metas, com botão "Trocar opção" e variação a cada dia;
   - mais carboidrato nos dias de treino, menos nos de descanso (o botão no topo alterna o tipo do dia).
+- **Contador de proteína**: cada alimento é confirmado individualmente; o que passou do horário fica *pendente*.
+- **Trocar alimento no dia** (✏️): comeu carne em vez de frango? Troque pelo que comeu — mais de 80 alimentos com a
+  proteína de cada um, quantidade equivalente sugerida, ou digite um alimento qualquer. Também dá para registrar algo a mais.
+- **Tema claro ou escuro** (Perfil → Aparência). O padrão é claro.
 - **Progresso**: gráfico de água e refeições dos últimos 7 dias, registro de peso com análise do ritmo de ganho (ajusta as metas automaticamente).
 
 Todos os dados ficam salvos **apenas no seu aparelho** (localStorage). Há opção de exportar backup.
