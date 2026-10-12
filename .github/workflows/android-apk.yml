@@ -1,0 +1,53 @@
+name: Gerar APK Android
+
+on:
+  push:
+    branches: ['**']
+  workflow_dispatch:
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Criar projeto Android
+        run: |
+          npm run build
+          npx cap add android
+          npm run android:icons
+          npx cap sync android
+
+      # Mesma chave em todos os builds: dá para instalar a versão nova por cima sem perder os dados.
+      - name: Chave de assinatura fixa
+        run: |
+          mkdir -p ~/.android
+          cp android-signing/debug.keystore ~/.android/debug.keystore
+
+      - name: Compilar APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Renomear APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk HidraFit.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: HidraFit-apk
+          path: HidraFit.apk
+          retention-days: 30

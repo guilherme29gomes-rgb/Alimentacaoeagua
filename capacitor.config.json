@@ -1,0 +1,8 @@
+{
+  "appId": "com.hidrafit.app",
+  "appName": "HidraFit",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#f2f6fa"
+  }
+}

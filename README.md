@@ -27,7 +27,40 @@ python3 -m http.server 8000
 Ou publique no **GitHub Pages** (Settings → Pages → branch → pasta raiz) e abra o link no celular.
 No celular, use **"Adicionar à tela inicial"** para instalar como aplicativo (funciona offline).
 
-### Sobre as notificações
+## 📱 APK para Android
+
+O app é empacotado com [Capacitor](https://capacitorjs.com). No APK os lembretes são **notificações nativas agendadas**
+(água e refeições para os próximos 5 dias, renovadas sempre que você abre o app), então chegam **mesmo com o app fechado**.
+
+### Baixar o APK pronto (GitHub Actions)
+
+A cada push, o workflow **"Gerar APK Android"** compila o app:
+
+1. Abra a aba **Actions** do repositório → clique na execução mais recente de "Gerar APK Android".
+2. Em **Artifacts**, baixe **HidraFit-apk** (é um .zip com o `HidraFit.apk` dentro).
+3. No celular, abra o `HidraFit.apk` e permita "instalar apps de fontes desconhecidas".
+4. Ao abrir, vá em **Perfil → Ativar notificações**.
+
+Dica: em alguns celulares (Xiaomi, Samsung, Motorola) é bom desativar a "otimização de bateria" do HidraFit para os avisos
+saírem no horário exato.
+
+O APK é assinado sempre com a mesma chave (`android-signing/debug.keystore`), então versões novas instalam por cima sem
+apagar seus dados. Para publicar na Play Store é preciso gerar uma chave de release própria e um `.aab`.
+
+### Compilar no seu computador
+
+Requer Node 20+, JDK 17 e Android SDK (Android Studio):
+
+```bash
+npm install
+npm run android:add     # cria a pasta android/ (só na primeira vez)
+npm run android:icons   # gera os ícones a partir de assets/
+npm run android:apk     # APK em android/app/build/outputs/apk/debug/
+```
+
+Ou `npx cap open android` para abrir no Android Studio.
+
+### Sobre as notificações (versão web)
 
 Toque em **Perfil → Ativar notificações**. Os avisos são disparados enquanto o app estiver aberto ou em segundo plano
 (como app instalado). Navegadores podem pausar abas fechadas por completo; se quiser avisos garantidos com o app
@@ -42,5 +75,8 @@ fechado, o próximo passo é empacotar como app nativo (ex.: Capacitor) com noti
 | `styles.css` | Visual (modo claro/escuro automático) |
 | `sw.js` | Service worker: offline + notificações |
 | `manifest.webmanifest`, `icon.svg` | Instalação como app |
+| `capacitor.config.json`, `package.json` | Empacotamento Android (Capacitor) |
+| `assets/` | Imagens de origem do ícone e da tela de abertura |
+| `.github/workflows/android-apk.yml` | Gera o APK automaticamente |
 
 > ⚠️ As recomendações são gerais, baseadas em fórmulas científicas. Não substituem a avaliação de um nutricionista ou médico.

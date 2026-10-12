@@ -10,6 +10,15 @@ const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const round = (v, step = 1) => Math.round(v / step) * step;
 
+/* ---------------- App Android (Capacitor) ----------------
+   No APK, os lembretes viram notificações nativas agendadas no sistema,
+   que chegam mesmo com o app fechado. No navegador, nada disso existe. */
+const Native = (() => {
+  const cap = window.Capacitor;
+  const isNative = !!(cap && cap.isNativePlatform && cap.isNativePlatform());
+  return { isNative, LN: isNative && cap.Plugins ? cap.Plugins.LocalNotifications : null };
+})();
+
 /* ---------------- Armazenamento ---------------- */
 const store = {
   get(key, fallback) {
@@ -362,7 +371,7 @@ function buildDayPlan(p, d = new Date()) {
    ========================================================= */
 let profile = store.get('profile', null);
 const settings = Object.assign({ waterRem: true, mealRem: true, interval: 'auto' }, store.get('settings', {}));
-const saveSettings = () => store.set('settings', settings);
+const saveSettings = () => { store.set('settings', settings); scheduleNative(); };
 
 const waterLog = () => store.get('water', {});
 const todayWater = () => waterLog()[dateKey()] || [];
@@ -383,6 +392,7 @@ function addWater(ml) {
   if (before < goal && after >= goal) { celebrate(); toast('🎉 Meta de água batida! Seu corpo agradece.'); }
   else toast(`+${ml} ml 💧 ${motivation(after / goal)}`);
   renderWater();
+  scheduleNative();
 }
 
 function removeWater(t) {
@@ -606,6 +616,16 @@ function renderProfile() {
 function renderNotifStatus() {
   const el = $('#notif-status');
   const btn = $('#enable-notif');
+  if (Native.LN) {
+    Native.LN.checkPermissions().then(perm => {
+      const ok = perm.display === 'granted';
+      el.textContent = ok ? '✅ Notificações ativadas — você recebe os avisos mesmo com o app fechado.'
+        : perm.display === 'denied' ? '🚫 Notificações bloqueadas. Libere em Configurações → Apps → HidraFit → Notificações.'
+          : 'Toque em "Ativar notificações" para receber os lembretes.';
+      btn.classList.toggle('hidden', ok);
+    }).catch(() => {});
+    return;
+  }
   if (!('Notification' in window)) {
     el.textContent = 'Este navegador não suporta notificações — os avisos aparecem só dentro do app.';
     btn.classList.add('hidden');
@@ -629,10 +649,10 @@ function renderAll() {
 /* =========================================================
    LEMBRETES
    ========================================================= */
-function reminderInterval() {
+function reminderInterval(d = new Date()) {
   if (settings.interval !== 'auto') return Number(settings.interval);
   const clk = dayClock(profile);
-  const goal = waterGoal(profile, isTrainingDay(profile)).goal;
+  const goal = waterGoal(profile, isTrainingDay(profile, d)).goal;
   const cups = goal / 250;
   return clamp(round((clk.sleep - 60 - clk.wake) / cups, 5), 30, 120);
 }
@@ -657,6 +677,7 @@ function nextWaterReminder() {
 
 async function notify(title, body, tag) {
   toast(`${title} — ${body}`, 6000);
+  if (Native.isNative) { if (tag === 'test') nativeTest(title, body); return; } // o sistema já mostra as agendadas
   if (!('Notification' in window) || Notification.permission !== 'granted') return;
   try {
     const reg = 'serviceWorker' in navigator ? await navigator.serviceWorker.getRegistration() : null;
@@ -680,6 +701,7 @@ function checkReminders() {
       const left = wg.goal - sumMl(todayWater());
       notify('💧 Hora de beber água', `Faltam ${fmtMl(left)} para sua meta de hoje. Que tal um copo agora?`, 'water');
       renderWater();
+      scheduleNative();
     }
   }
 
@@ -694,12 +716,85 @@ function checkReminders() {
         list.push(m.id);
         store.set('mealNotified', { date: today, ids: list });
         const def = MEAL_TYPES[m.type];
-        const preview = m.items.filter(it => !['salada', 'legumes'].includes(it.id)).slice(0, 3).map(it => `${it.name.split(' (')[0]} (${it.label})`).join(', ');
-        notify(`${def.icon} ${def.name} às ${fmtTime(m.time)}`, preview, 'meal');
+        notify(`${def.icon} ${def.name} às ${fmtTime(m.time)}`, mealPreview(m), 'meal');
         break;
       }
     }
   }
+}
+
+const mealPreview = m => m.items.filter(it => !['salada', 'legumes'].includes(it.id)).slice(0, 3)
+  .map(it => `${it.name.split(' (')[0]} (${it.label})`).join(', ');
+
+/* ---------- Notificações nativas (APK) ---------- */
+const NATIVE_DAYS = 5; // agenda alguns dias à frente; reabrir o app renova
+let nativeQueue = Promise.resolve();
+function scheduleNative() {
+  if (!Native.LN || !profile) return;
+  nativeQueue = nativeQueue.then(doScheduleNative).catch(err => console.warn('agendamento', err));
+}
+
+async function doScheduleNative() {
+  const LN = Native.LN;
+  const pending = await LN.getPending();
+  if (pending.notifications.length) await LN.cancel({ notifications: pending.notifications.map(n => ({ id: n.id })) });
+  if (!profile.reminders) return;
+  const perm = await LN.checkPermissions();
+  if (perm.display !== 'granted') return;
+
+  const clk = dayClock(profile);
+  const now = Date.now();
+  const list = [];
+  let id = 1;
+  const push = (title, body, when) => {
+    if (when.getTime() > now + 30 * 1000) list.push({ id: id++, title, body, channelId: 'lembretes', schedule: { at: when, allowWhileIdle: true } });
+  };
+  for (let day = 0; day < NATIVE_DAYS; day++) {
+    const d = new Date(); d.setDate(d.getDate() + day); d.setHours(0, 0, 0, 0);
+    const at = min => { const t = new Date(d); t.setMinutes(min); return t; }; // min > 1440 cai no dia seguinte
+    const training = isTrainingDay(profile, d);
+    if (settings.waterRem) {
+      const wg = waterGoal(profile, training);
+      const reached = day === 0 && sumMl(todayWater()) >= wg.goal;
+      if (!reached) {
+        const interval = reminderInterval(d);
+        const start = day === 0 ? Math.max(lastWaterMinute(), clk.wake) + interval : clk.wake + interval;
+        for (let m = start; m <= clk.sleep - 30; m += interval) {
+          push('💧 Hora de beber água', `Meta ${day === 0 ? 'de hoje' : 'do dia'}: ${fmtMl(wg.goal)}. Que tal um copo agora?`, at(m));
+        }
+      }
+    }
+    if (settings.mealRem) {
+      const done = day === 0 ? new Set(store.get('mealsDone', {})[dateKey()] || []) : new Set();
+      for (const m of buildDayPlan(profile, d).meals) {
+        if (done.has(m.id)) continue;
+        const def = MEAL_TYPES[m.type];
+        push(`${def.icon} ${def.name} às ${fmtTime(m.time)}`, mealPreview(m), at(m.time));
+      }
+    }
+  }
+  if (list.length) await LN.schedule({ notifications: list });
+}
+
+async function nativeTest(title, body) {
+  if (!Native.LN) return;
+  try {
+    await LN_ensurePermission();
+    await Native.LN.schedule({ notifications: [{ id: 99999, title, body, channelId: 'lembretes', schedule: { at: new Date(Date.now() + 3000) } }] });
+  } catch (err) { console.warn(err); }
+}
+
+async function LN_ensurePermission() {
+  let perm = await Native.LN.checkPermissions();
+  if (perm.display !== 'granted') perm = await Native.LN.requestPermissions();
+  return perm.display === 'granted';
+}
+
+async function initNative() {
+  if (!Native.LN) return;
+  try {
+    await Native.LN.createChannel({ id: 'lembretes', name: 'Lembretes de água e refeições', importance: 4, vibration: true, visibility: 1 });
+  } catch { /* iOS / versões antigas */ }
 }
 
 /* =========================================================
@@ -820,6 +915,7 @@ function finishOnboarding() {
   const weights = store.get('weights', []);
   if (isNew || profile.weight !== oldWeight) { weights.push({ t: Date.now(), kg: profile.weight }); store.set('weights', weights); }
   startApp();
+  scheduleNative();
   toast(isNew ? `Plano pronto, ${profile.name}! 💪` : 'Perfil atualizado — plano recalculado.');
   if (isNew && profile.reminders) requestNotifications();
 }
@@ -853,6 +949,7 @@ function bindEvents() {
     ov[dateKey()] = !isTrainingDay(profile);
     store.set('dayOverride', ov);
     renderAll();
+    scheduleNative();
     toast(ov[dateKey()] ? 'Hoje: dia de treino — mais água e carboidrato.' : 'Hoje: dia de descanso.');
   });
 
@@ -864,6 +961,7 @@ function bindEvents() {
     e.target.checked ? set.add(e.target.dataset.id) : set.delete(e.target.dataset.id);
     all[key] = [...set];
     store.set('mealsDone', all);
+    scheduleNative();
     if (e.target.checked) toast('Refeição registrada ✅');
     renderDiet(); renderProgress();
   });
@@ -876,6 +974,7 @@ function bindEvents() {
     alts[key][b.dataset.id] = (alts[key][b.dataset.id] || 0) + 1;
     store.set('alts', alts);
     renderDiet();
+    scheduleNative();
   });
 
   $('#weight-form').addEventListener('submit', e => {
@@ -890,6 +989,7 @@ function bindEvents() {
     store.set('profile', profile);
     input.value = '';
     renderAll();
+    scheduleNative();
     toast('Peso registrado — metas de água e comida recalculadas.');
   });
 
@@ -918,10 +1018,11 @@ function bindEvents() {
   $('#reset-data').addEventListener('click', () => {
     if (!confirm('Apagar perfil, histórico de água, refeições e pesos? Isso não pode ser desfeito.')) return;
     Object.keys(localStorage).filter(k => k.startsWith('hf_')).forEach(k => localStorage.removeItem(k));
+    if (Native.LN) Native.LN.getPending().then(p => p.notifications.length && Native.LN.cancel({ notifications: p.notifications.map(n => ({ id: n.id })) })).catch(() => {});
     location.reload();
   });
 
-  document.addEventListener('visibilitychange', () => { if (!document.hidden && profile) { renderAll(); checkReminders(); } });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && profile) { renderAll(); checkReminders(); scheduleNative(); } });
 }
 
 function enableReminders() {
@@ -929,6 +1030,12 @@ function enableReminders() {
 }
 
 async function requestNotifications() {
+  if (Native.LN) {
+    try { if (await LN_ensurePermission()) toast('Notificações ativadas! 🔔'); } catch { /* ignorado */ }
+    renderNotifStatus();
+    scheduleNative();
+    return;
+  }
   if (!('Notification' in window)) { toast('Seu navegador não suporta notificações.'); return; }
   try {
     const res = await Notification.requestPermission();
@@ -955,8 +1062,10 @@ function startApp() {
 }
 
 bindEvents();
+if (Native.isNative) $('#export-data').classList.add('hidden'); // download de arquivo não funciona no WebView
 if (profile) startApp(); else openOnboarding();
+initNative().then(scheduleNative);
 
-if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+if ('serviceWorker' in navigator && location.protocol !== 'file:' && !Native.isNative) {
   navigator.serviceWorker.register('sw.js').catch(() => {});
 }

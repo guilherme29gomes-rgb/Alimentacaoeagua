@@ -1,0 +1,22 @@
+{
+  "name": "hidrafit",
+  "version": "1.0.0",
+  "private": true,
+  "description": "HidraFit — controle de água e plano alimentar para ganho de massa magra",
+  "scripts": {
+    "build": "node scripts/build-web.mjs",
+    "android:add": "npm run build && npx cap add android",
+    "android:sync": "npm run build && npx cap sync android",
+    "android:icons": "npx @capacitor/assets generate --android --iconBackgroundColor \"#0b84d8\" --splashBackgroundColor \"#0b84d8\"",
+    "android:apk": "npm run android:sync && cd android && ./gradlew assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "6.2.2",
+    "@capacitor/core": "6.2.2",
+    "@capacitor/local-notifications": "6.1.3"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "3.0.5",
+    "@capacitor/cli": "6.2.2"
+  }
+}
