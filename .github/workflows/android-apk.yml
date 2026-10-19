@@ -1,0 +1,70 @@
+name: Gerar APK Android
+
+on:
+  push:
+    branches: ['**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Criar projeto Android
+        run: |
+          npm run build
+          npx cap add android
+          npm run android:icons
+          npx cap sync android
+
+      # Mesma chave em todos os builds: a versão nova instala por cima sem perder o progresso.
+      - name: Chave de assinatura fixa
+        run: |
+          mkdir -p ~/.android
+          cp android-signing/debug.keystore ~/.android/debug.keystore
+
+      # O runner ubuntu já tem o Android SDK em $ANDROID_HOME
+      - name: Compilar APK
+        working-directory: android
+        run: |
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Renomear APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk TrilhaFluente.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TrilhaFluente-apk
+          path: TrilhaFluente.apk
+          retention-days: 30
+
+      # Link fixo para baixar direto no celular:
+      # https://github.com/<dono>/<repo>/releases/download/app/TrilhaFluente.apk
+      - name: Publicar link de download
+        if: github.ref_name == github.event.repository.default_branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view app >/dev/null 2>&1 || gh release create app \
+            --title "Trilha Fluente — APK mais recente" \
+            --notes "Baixe o TrilhaFluente.apk abaixo e abra no celular Android. Atualizado automaticamente a cada nova versão." \
+            --target "$GITHUB_SHA"
+          gh release upload app TrilhaFluente.apk --clobber

@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="pt-BR" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#4f46e5">
+  <meta name="description" content="Trilha completa de inglês do iniciante ao fluente: lições, exercícios, vocabulário, músicas, leitura, filmes e acompanhamento da sua evolução.">
+  <title>Trilha Fluente</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <button class="back hidden" id="back" aria-label="Voltar">‹</button>
+    <div class="brand" id="title-wrap">
+      <img src="icon.svg" alt="" width="30" height="30" id="brand-icon">
+      <h1 id="title">Trilha Fluente</h1>
+    </div>
+    <div class="chips-top">
+      <span class="chip" id="streak-chip" title="Dias seguidos estudando">🔥 0</span>
+      <span class="chip" id="xp-chip" title="XP de hoje / meta diária">⭐ 0</span>
+    </div>
+  </header>
+
+  <main id="view" tabindex="-1"></main>
+
+  <nav class="tabbar" aria-label="Seções">
+    <button data-tab="trilha" class="active"><span>🗺️</span>Trilha</button>
+    <button data-tab="vocab"><span>📚</span>Vocabulário</button>
+    <button data-tab="extras"><span>🎧</span>Extras</button>
+    <button data-tab="evolucao"><span>📈</span>Evolução</button>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
+
+  <script src="data/levels-a.js"></script>
+  <script src="data/levels-b.js"></script>
+  <script src="data/levels-c.js"></script>
+  <script src="data/extras.js"></script>
+  <script src="data/vocab-1.js"></script>
+  <script src="data/vocab-1b.js"></script>
+  <script src="data/vocab-2.js"></script>
+  <script src="data/vocab-3.js"></script>
+  <script src="data/vocab-4.js"></script>
+  <script src="data/vocab-5.js"></script>
+  <script src="data/vocab-6.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+  "appId": "com.trilhafluente.app",
+  "appName": "Trilha Fluente",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#f4f5fb"
+  }
+}
