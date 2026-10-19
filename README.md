@@ -25,7 +25,9 @@ App (web + Android) com a trilha completa de estudo de inglês, organizada pelos
   Um nível é concluído com 80% (assuntos + eu consigo + extras + leituras + vocabulário do nível).
 - Tema claro (padrão) ou escuro, velocidade da voz e lembrete diário (no app Android).
 
-Todo o progresso fica salvo **no próprio aparelho**.
+Todo o progresso fica salvo **no próprio aparelho**. Em **Evolução → Configurações** há **backup** (no Android abre o
+“Compartilhar” para salvar no Google Drive, WhatsApp, e-mail…) e **restauração**, que também serve para levar o
+progresso do navegador para o app e vice-versa.
 
 ## Baixar o APK (Android)
 

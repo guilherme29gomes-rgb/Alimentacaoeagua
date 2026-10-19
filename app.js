@@ -125,7 +125,7 @@ const Native = (() => {
   const cap = window.Capacitor;
   const isNative = !!(cap && cap.isNativePlatform && cap.isNativePlatform());
   const P = isNative && cap.Plugins ? cap.Plugins : {};
-  return { isNative, TTS: P.TextToSpeech, LN: P.LocalNotifications };
+  return { isNative, TTS: P.TextToSpeech, LN: P.LocalNotifications, FS: P.Filesystem, Share: P.Share };
 })();
 
 let enVoice = null;
@@ -607,9 +607,13 @@ function viewEvolucao() {
       <select id="set-rem"><option value="off">Desligado</option>${['07:00', '08:00', '12:30', '18:00', '19:00', '20:00', '21:00', '22:00'].map(h => `<option value="${h}" ${S.settings.reminder && S.settings.reminderTime === h ? 'selected' : ''}>Todo dia às ${h}</option>`).join('')}</select></label>` : ''}
     <div class="btn-row">
       <button class="btn ghost" data-act="say" data-text="Hello! This is how the voice sounds.">🔊 Testar voz</button>
-      ${Native.isNative ? '' : '<button class="btn ghost" data-act="export">💾 Backup</button>'}
-      <button class="btn danger" data-act="reset">Apagar progresso</button>
     </div>
+    <div class="btn-row">
+      <button class="btn" data-act="export">💾 Fazer backup</button>
+      <button class="btn ghost" data-act="import">📂 Restaurar backup</button>
+    </div>
+    <p class="small muted" style="margin:.5rem 0 0">O backup é um arquivo com todo o seu progresso. ${Native.isNative ? 'Salve no Google Drive, WhatsApp ou e-mail' : 'Guarde o arquivo baixado'} e use “Restaurar” para levar o progresso para outro aparelho (app ou navegador).</p>
+    <div class="btn-row"><button class="btn danger" data-act="reset">Apagar progresso</button></div>
   </section>
   <p class="small muted" style="text-align:center;padding:0 1rem">Níveis seguem o Quadro Europeu Comum (CEFR): A1–A2 básico, B1–B2 independente, C1–C2 proficiente.</p>`;
   return { title: 'Sua evolução', html };
@@ -710,6 +714,7 @@ document.addEventListener('click', e => {
     case 'vquiz-new': newVQuiz(); render(); break;
     case 'theme': S.settings.theme = el.dataset.v; save(); applyTheme(); render(); break;
     case 'export': exportData(); break;
+    case 'import': importData(); break;
     case 'reset':
       if (confirm('Apagar todo o seu progresso (assuntos, palavras, extras, XP)? Isso não pode ser desfeito.')) {
         const keep = S.settings; S = JSON.parse(JSON.stringify(DEFAULT)); S.settings = keep; save(); quiz = null; rquiz = null; go('trilha');
@@ -790,13 +795,51 @@ function applyTheme() {
   if (m) m.content = dark ? '#0f1120' : '#4f46e5';
 }
 
-function exportData() {
-  const blob = new Blob([JSON.stringify(S, null, 2)], { type: 'application/json' });
+/* ---------- Backup e restauração ---------- */
+async function exportData() {
+  const json = JSON.stringify({ app: 'trilha-fluente', version: 1, savedAt: new Date().toISOString(), state: S }, null, 2);
+  const name = `trilha-fluente-backup-${dateKey()}.json`;
+  if (Native.FS && Native.Share) {
+    // Android: grava o arquivo e abre o "Compartilhar" (Drive, WhatsApp, e-mail, Arquivos...)
+    try {
+      const { uri } = await Native.FS.writeFile({ path: name, data: json, directory: 'CACHE', encoding: 'utf8' });
+      await Native.Share.share({ title: 'Backup Trilha Fluente', text: 'Backup do meu progresso no Trilha Fluente', url: uri, dialogTitle: 'Salvar backup em…' });
+    } catch (err) {
+      if (!String(err && err.message).toLowerCase().includes('cancel')) toast('Não foi possível gerar o backup.');
+    }
+    return;
+  }
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `trilha-fluente-${dateKey()}.json`;
+  a.href = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+  a.download = name;
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  toast('Backup baixado 💾');
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.addEventListener('change', async () => {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    try {
+      const data = JSON.parse(await file.text());
+      const st = data && data.app === 'trilha-fluente' ? data.state : data;
+      if (!st || typeof st !== 'object' || !st.topics || !st.words) throw new Error('formato');
+      const words = Object.values(st.words).filter(x => x === 'k').length;
+      const topics = Object.values(st.topics).filter(t => t.done || t.manual).length;
+      const when = data.savedAt ? ` de ${new Date(data.savedAt).toLocaleDateString('pt-BR')}` : '';
+      if (!confirm(`Restaurar o backup${when}? (${topics} assuntos e ${words} palavras)\nO progresso atual deste aparelho será substituído.`)) return;
+      S = { ...JSON.parse(JSON.stringify(DEFAULT)), ...st, settings: { ...DEFAULT.settings, ...(st.settings || {}) } };
+      save(); quiz = null; rquiz = null; vocab.flash = null; vocab.quiz = null;
+      applyTheme(); scheduleReminder(false); render();
+      toast('Progresso restaurado ✅');
+    } catch {
+      toast('Arquivo inválido. Escolha o arquivo de backup do Trilha Fluente (.json).', 4000);
+    }
+  });
+  input.click();
 }
 
 /* Lembrete diário (somente no app Android) */
