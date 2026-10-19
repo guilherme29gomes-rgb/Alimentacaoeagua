@@ -3,6 +3,32 @@
               ['fill', frase com ___, [respostas aceitas], explicação] */
 window.LEVELS = window.LEVELS || [];
 
+/* Blocos interativos das lições de alfabeto e números (toque para ouvir) */
+const A1X = (() => {
+  const tile = (label, speak, sub) => `<button class="tile" data-act="say" data-text="${speak}"><b>${label}</b><small>${sub}</small></button>`;
+  const say = (t, show) => `<span class="say-inline">${show || t} <button class="say" data-act="say" data-text="${t}" aria-label="Ouvir">🔊</button></span>`;
+  const letters = [['A', 'ay', 'êi'], ['B', 'bee', 'bí'], ['C', 'see', 'sí'], ['D', 'dee', 'dí'], ['E', 'ee', 'í'], ['F', 'ef', 'éf'],
+    ['G', 'gee', 'djí'], ['H', 'aitch', 'êitch'], ['I', 'eye', 'ái'], ['J', 'jay', 'djêi'], ['K', 'kay', 'kêi'], ['L', 'el', 'él'],
+    ['M', 'em', 'ém'], ['N', 'en', 'én'], ['O', 'oh', 'ôu'], ['P', 'pee', 'pí'], ['Q', 'cue', 'kiú'], ['R', 'ar', 'ár'],
+    ['S', 'ess', 'és'], ['T', 'tee', 'tí'], ['U', 'you', 'iú'], ['V', 'vee', 'ví'], ['W', 'double you', 'dâbliu'], ['X', 'ex', 'éks'],
+    ['Y', 'why', 'uái'], ['Z', 'zee', 'zí / zéd']];
+  const nato = ['Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel', 'India', 'Juliett', 'Kilo', 'Lima', 'Mike',
+    'November', 'Oscar', 'Papa', 'Quebec', 'Romeo', 'Sierra', 'Tango', 'Uniform', 'Victor', 'Whiskey', 'X-ray', 'Yankee', 'Zulu'];
+  const units = 'zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen twenty'.split(' ');
+  const tens = [[20, 'twenty'], [30, 'thirty'], [40, 'forty'], [50, 'fifty'], [60, 'sixty'], [70, 'seventy'], [80, 'eighty'], [90, 'ninety']];
+  const ordinals = [['1st', 'first'], ['2nd', 'second'], ['3rd', 'third'], ['4th', 'fourth'], ['5th', 'fifth'], ['6th', 'sixth'],
+    ['7th', 'seventh'], ['8th', 'eighth'], ['9th', 'ninth'], ['10th', 'tenth'], ['11th', 'eleventh'], ['12th', 'twelfth'],
+    ['13th', 'thirteenth'], ['20th', 'twentieth'], ['21st', 'twenty-first'], ['22nd', 'twenty-second'], ['23rd', 'twenty-third'], ['31st', 'thirty-first']];
+  return {
+    say,
+    alphabet: `<div class="tiles">${letters.map(([l, , pt]) => tile(l, l, pt)).join('')}</div>`, // o leitor de voz diz o nome da letra
+    nato: `<div class="tiles wide">${nato.map(w => tile(w[0], w, w)).join('')}</div>`,
+    units: `<div class="tiles">${units.map((w, i) => tile(i, w, w)).join('')}</div>`,
+    tens: `<div class="tiles">${tens.map(([n, w]) => tile(n, w, w)).join('')}</div>`,
+    ordinals: `<div class="tiles wide">${ordinals.map(([n, w]) => tile(n, w, w)).join('')}</div>`,
+  };
+})();
+
 window.LEVELS.push({
   id: 'a1', cefr: 'A1', name: 'Iniciante', color: '#22a06b',
   goal: 'Entender e usar frases do dia a dia, se apresentar e fazer perguntas simples.',
@@ -37,21 +63,85 @@ window.LEVELS.push({
       ],
     },
     {
-      id: 'a1-numbers', cat: 'Vocabulário', title: 'Alfabeto e números',
-      lesson: `<p><b>Alfabeto</b> — as letras que mais confundem brasileiros:</p>
-<ul><li><b>A</b> (êi) · <b>E</b> (í) · <b>I</b> (ái) — cuidado: E soa como nosso “i” e I como “ai”.</li>
-<li><b>G</b> (dji) · <b>J</b> (djêi) · <b>H</b> (êitch) · <b>R</b> (ár) · <b>W</b> (dâbliu) · <b>Y</b> (uái)</li></ul>
-<p><b>Números</b>: one, two, three, four, five, six, seven, eight, nine, ten, eleven, twelve, thirteen… twenty, thirty, forty (sem “u”!), fifty, one hundred, one thousand.</p>
-<p>💡 <b>-teen</b> (13–19) tem a sílaba forte no final: thir<b>TEEN</b>. <b>-ty</b> (30, 40…) tem a força no início: <b>THIR</b>ty.</p>
-<p>Telefone se lê número por número; o 0 pode ser “zero” ou “oh”.</p>`,
-      examples: [['Can you spell your name? — Sure: M-A-R-I-A.', 'Pode soletrar seu nome? — Claro: M-A-R-I-A.'], ["I'm twenty-five years old.", 'Tenho 25 anos.'], ['My phone number is 9-8-7-oh-1-2.', 'Meu telefone é 987012.']],
+      id: 'a1-alphabet', cat: 'Pronúncia', title: 'Alfabeto e como soletrar',
+      lesson: `<p>Em inglês você vai soletrar o tempo todo: nome, sobrenome, e-mail, endereço. <b>Toque em cada letra para ouvir</b> (embaixo, a pronúncia aproximada em português):</p>
+${A1X.alphabet}
+<p><b>⚠️ As que mais confundem brasileiros</b></p>
+<ul><li>As vogais soam diferente: <b>A</b> (êi) · <b>E</b> (í) · <b>I</b> (ái) · <b>O</b> (ôu) · <b>U</b> (iú). O <b>E</b> inglês soa como nosso “i”, e o <b>I</b> como “ai”.</li>
+<li><b>G</b> (djí) × <b>J</b> (djêi) — parecidos; o J termina em “êi”.</li>
+<li><b>H</b> (êitch), <b>R</b> (ár), <b>W</b> (dâbliu = “double u”), <b>Y</b> (uái).</li>
+<li><b>Z</b> é “zí” nos EUA e “zéd” no Reino Unido.</li></ul>
+<p><b>Soletrando</b></p>
+<ul><li>${A1X.say('How do you spell your name?')} — Como se soletra seu nome?</li>
+<li>${A1X.say('It is S, I, L, V, A.', "It's S-I-L-V-A.")}</li>
+<li>Letras repetidas: <b>double</b> — ${A1X.say('B, E, double L, A', 'Bella = B-E-double L-A')} (também pode dizer L-L)</li>
+<li>Maiúscula = <b>capital letter</b> · minúscula = <b>lowercase / small letter</b></li></ul>
+<p><b>E-mail e internet</b></p>
+<ul><li><b>@</b> = at · <b>.</b> = dot · <b>-</b> = dash (ou hyphen) · <b>_</b> = underscore · <b>/</b> = slash</li>
+<li>${A1X.say('ana dot silva at gmail dot com', 'ana.silva@gmail.com → “ana dot silva at gmail dot com”')}</li></ul>
+<p><b>Alfabeto do telefone</b> — para não haver confusão (B ou D? M ou N?), usa-se uma palavra para cada letra: “B as in Bravo”.</p>
+${A1X.nato}`,
+      examples: [['How do you spell your last name?', 'Como se soletra o seu sobrenome?'], ["It's G-O-M-E-S.", 'É G-O-M-E-S.'], ['My email is paulo at gmail dot com.', 'Meu e-mail é paulo@gmail.com.']],
       ex: [
-        ['mc', 'Como se escreve 40 em inglês?', ['fourty', 'forty', 'fourteen'], 1, '40 = forty (sem o “u”).'],
-        ['mc', 'A letra “E” em inglês soa como:', ['é', 'ái', 'í'], 2, 'E soa como “í”.'],
-        ['fill', '3 + 4 = ___', ['seven'], '7 = seven.'],
-        ['fill', '12 = ___', ['twelve'], '12 = twelve.'],
-        ['mc', '“I am 30 years old” — 30 se escreve:', ['thirteen', 'thirty', 'three'], 1, '30 = thirty; 13 = thirteen.'],
-        ['fill', '100 = one ___', ['hundred'], '100 = one hundred.'],
+        ['listen', 'G', ['G', 'J', 'Z'], 0, 'G soa “djí”.'],
+        ['listen', 'J', ['G', 'J', 'Y'], 1, 'J soa “djêi”.'],
+        ['listen', 'I', ['E', 'I', 'A'], 1, 'I soa “ái”.'],
+        ['listen', 'E', ['I', 'E', 'A'], 1, 'E soa “í”.'],
+        ['listen', 'H, Y, R', ['H - Y - R', 'A - I - R', 'H - I - A'], 0, 'H (êitch), Y (uái), R (ár).'],
+        ['mc', 'Como se lê a letra W?', ['dâbliu (double u)', 'vê dobrado', 'uí'], 0, 'W = double u (dâbliu).'],
+        ['fill', 'No e-mail, o símbolo @ se lê ___', ['at'], '@ = at.'],
+        ['mc', 'Em um e-mail, “dot” é o:', ['ponto (.)', 'arroba (@)', 'traço (-)'], 0, 'dot = ponto.'],
+      ],
+    },
+    {
+      id: 'a1-numbers', cat: 'Vocabulário', title: 'Números de 0 a 1 milhão',
+      lesson: `<p><b>0 a 20</b> — toque para ouvir:</p>
+${A1X.units}
+<p><b>Dezenas</b>:</p>
+${A1X.tens}
+<p>💡 <b>forty</b> (40) não tem “u”, mesmo four (4) e fourteen (14) tendo.</p>
+<p><b>-teen × -ty</b> (a confusão mais comum!): ${A1X.say('thirteen', '13 thir<b>TEEN</b>')} tem a força no final e um “n”. ${A1X.say('thirty', '30 <b>THIR</b>ty')} tem a força no começo.</p>
+<p><b>21 a 99</b> — dezena + hífen + unidade: ${A1X.say('twenty-one', '21 twenty-one')} · ${A1X.say('forty-five', '45 forty-five')} · ${A1X.say('ninety-nine', '99 ninety-nine')}</p>
+<p><b>Centenas</b>: ${A1X.say('one hundred', '100 one hundred')} (ou <i>a hundred</i>) · ${A1X.say('one hundred and five', '105 one hundred and five')} · ${A1X.say('two hundred and fifty', '250 two hundred (and) fifty')}. O “and” é comum no Reino Unido; nos EUA é opcional.</p>
+<p><b>Milhares e milhões</b>: ${A1X.say('one thousand', '1,000 one thousand')} · ${A1X.say('two thousand five hundred', '2,500 two thousand five hundred')} · ${A1X.say('ten thousand', '10,000 ten thousand')} · ${A1X.say('one hundred thousand', '100,000 one hundred thousand')} · ${A1X.say('one million', '1,000,000 one million')} · ${A1X.say('one billion', '1,000,000,000 one billion')} (= 1 bilhão)</p>
+<ul><li>⚠️ Sem plural depois de número: <b>two hundred</b>, <b>five thousand</b>, <b>three million</b> (nunca “two hundreds”).</li>
+<li>Mas no plural quando é “muitos”: <i>hundreds of people</i> (centenas de pessoas), <i>thousands of dollars</i>.</li>
+<li>⚠️ Inglês usa <b>vírgula</b> para milhar e <b>ponto</b> para decimal — o contrário do português: 1,500 = mil e quinhentos; 1.5 = um e meio.</li></ul>`,
+      examples: [['There are thirty-two students in my class.', 'Há trinta e dois alunos na minha turma.'], ['The car costs fifteen thousand dollars.', 'O carro custa quinze mil dólares.'], ['More than two million people live here.', 'Mais de dois milhões de pessoas moram aqui.']],
+      ex: [
+        ['listen', 'fifteen', ['15', '50', '5'], 0, 'fifteen = 15 (fifty = 50).'],
+        ['listen', 'forty', ['14', '40', '4'], 1, 'forty = 40, força no início.'],
+        ['listen', 'seventy-three', ['73', '37', '63'], 0, 'seventy-three = 73.'],
+        ['listen', 'three thousand two hundred', ['3,200', '320', '32,000'], 0, '3,200 = three thousand two hundred.'],
+        ['fill', '99 em inglês: ___', ['ninety-nine', 'ninety nine'], '99 = ninety-nine.'],
+        ['mc', '200 em inglês:', ['two hundreds', 'two hundred', 'two hundred of'], 1, 'Sem plural: two hundred.'],
+        ['mc', 'Em inglês, “1,500” significa:', ['um vírgula cinco', 'mil e quinhentos'], 1, 'Vírgula separa milhar em inglês.'],
+        ['fill', '1.000.000 = one ___', ['million'], '1 milhão = one million.'],
+      ],
+    },
+    {
+      id: 'a1-numbers2', cat: 'Vocabulário', title: 'Números no dia a dia: ordinais, datas, preços',
+      lesson: `<p><b>Ordinais</b> (primeiro, segundo…) — usados em datas, andares e posições:</p>
+${A1X.ordinals}
+<ul><li>Regra: número + <b>th</b> (fourth, sixth). Terminados em 1, 2, 3 usam <b>st, nd, rd</b>: 21st, 32nd, 43rd — exceto 11th, 12th, 13th.</li>
+<li>Irregulares: first, second, third, fifth, eighth, ninth, twelfth, twentieth.</li></ul>
+<p><b>Datas</b></p>
+<ul><li>EUA: ${A1X.say('May fifth', 'May 5th → “May fifth”')} · Reino Unido: ${A1X.say('the fifth of May', '“the fifth of May”')}</li>
+<li>⚠️ Nos EUA a data numérica é <b>mês/dia</b>: 04/07 = <b>7 de abril</b> (April 7th)!</li></ul>
+<p><b>Anos</b> — em pares: ${A1X.say('nineteen ninety-eight', '1998 nineteen ninety-eight')} · ${A1X.say('two thousand and five', '2005 two thousand (and) five')} · ${A1X.say('twenty twenty-five', '2025 twenty twenty-five')}</p>
+<p><b>Preços</b>: ${A1X.say('four ninety-nine', '$4.99 “four ninety-nine”')} ou “four dollars and ninety-nine cents” · ${A1X.say('twenty pounds', '£20 twenty pounds')} · ${A1X.say('fifty reais', 'R$50 fifty reais')}</p>
+<p><b>Telefone</b>: número por número; 0 = “oh” ou “zero”; repetido pode ser “double”: ${A1X.say('nine eight seven, double five, oh one', '987-5501 → nine eight seven, double five, oh one')}</p>
+<p><b>Decimais, porcentagem e frações</b>: ${A1X.say('two point five', '2.5 two point five')} · ${A1X.say('thirty percent', '30% thirty percent')} · ½ <b>a half</b> · ⅓ <b>a third</b> · ¼ <b>a quarter</b> · ¾ <b>three quarters</b></p>`,
+      examples: [['I live on the third floor.', 'Moro no terceiro andar.'], ['My birthday is on June twenty-first.', 'Meu aniversário é em 21 de junho.'], ['It costs nine ninety-nine.', 'Custa 9,99.']],
+      ex: [
+        ['listen', 'twenty-first', ['21st', '20th', '23rd'], 0, 'twenty-first = 21st.'],
+        ['fill', '3rd = ___', ['third'], '3º = third.'],
+        ['mc', '12º em inglês:', ['twelveth', 'twelfth', 'twelvth'], 1, 'twelfth (irregular).'],
+        ['listen', 'nineteen ninety-eight', ['1998', '1898', '9198'], 0, 'Anos se leem em pares: 19 | 98.'],
+        ['mc', 'Como se lê o ano 2025?', ['twenty twenty-five', 'two zero two five', 'twenty hundred twenty-five'], 0, '2025 = twenty twenty-five.'],
+        ['mc', 'Nos EUA, a data 04/07 significa:', ['4 de julho', '7 de abril'], 1, 'EUA usa mês/dia: April 7th.'],
+        ['listen', 'two point five', ['2.5', '25', '2,500'], 0, 'point = vírgula decimal: 2.5.'],
+        ['fill', '½ = a ___', ['half'], '½ = a half.'],
       ],
     },
     {

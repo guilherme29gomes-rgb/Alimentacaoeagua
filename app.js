@@ -293,7 +293,7 @@ function exerciseHtml(e, i, ans) {
   const [type, q] = e;
   const qText = esc(q).replace('___', '<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>');
   let body;
-  if (type === 'mc') {
+  if (type === 'mc' || type === 'listen') {
     const [, , opts, right] = e;
     body = `<div class="opts">${opts.map((o, j) => {
       let cls = '';
@@ -306,9 +306,12 @@ function exerciseHtml(e, i, ans) {
         value="${ans ? esc(ans.given) : ''}" class="${ans ? (ans.ok ? 'right' : 'wrong') : ''}" ${ans ? 'disabled' : ''}>
       ${ans ? '' : '<button class="btn small primary" type="submit">OK</button>'}</form>`;
   }
-  const expl = type === 'mc' ? e[4] : e[3];
+  const expl = type === 'fill' ? e[3] : e[4];
   const fb = ans ? `<div class="feedback ${ans.ok ? 'right' : 'wrong'}">${ans.ok ? '✅ Certo!' : `❌ ${type === 'fill' ? `Resposta: <b>${esc(e[2][0])}</b>. ` : ''}`} ${esc(expl)}</div>` : '';
-  return `<div class="ex"><div class="q"><span class="n">${i + 1}.</span>${qText}</div>${body}${fb}</div>`;
+  const head = type === 'listen'
+    ? `<div class="q listen-q"><span class="n">${i + 1}.</span>Ouça e escolha o que foi dito: <button class="btn small" data-act="say" data-text="${esc(q)}">🔊 Ouvir</button>${ans ? ` <span class="muted small">(“${esc(q)}”)</span>` : ''}</div>`
+    : `<div class="q"><span class="n">${i + 1}.</span>${qText}</div>`;
+  return `<div class="ex">${head}${body}${fb}</div>`;
 }
 
 function resultHtml(t) {

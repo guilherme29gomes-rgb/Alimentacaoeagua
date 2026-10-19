@@ -131,6 +131,18 @@ main { max-width: 720px; margin: 0 auto; padding: .4rem 1rem 96px; outline: none
 .say { border: 0; background: var(--primary-soft); color: var(--primary); border-radius: 50%; width: 2rem; height: 2rem;
   flex: 0 0 auto; cursor: pointer; font-size: .95rem; }
 
+/* Blocos “toque para ouvir” nas lições */
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: .4rem; margin: .5rem 0 .8rem; }
+.tiles.wide { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
+.tile { border: 1px solid var(--line); background: var(--card); color: var(--text); border-radius: 12px; padding: .45rem .2rem;
+  text-align: center; cursor: pointer; font: inherit; }
+.tile:active { transform: scale(.95); background: var(--primary-soft); }
+.tile b { display: block; font-size: 1.25rem; color: var(--primary); }
+.tile small { display: block; color: var(--muted); font-size: .72rem; overflow-wrap: anywhere; }
+.say-inline { overflow-wrap: anywhere; }
+.say-inline .say { width: 1.7rem; height: 1.7rem; font-size: .8rem; vertical-align: middle; }
+.listen-q .btn { margin-left: .3rem; }
+
 /* ---------- Exercícios ---------- */
 .ex { padding: .8rem 0; border-bottom: 1px solid var(--line); }
 .ex:last-child { border-bottom: 0; }

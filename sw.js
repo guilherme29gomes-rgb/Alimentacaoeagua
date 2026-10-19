@@ -1,5 +1,5 @@
 /* Service worker: o app funciona offline. */
-const CACHE = 'trilha-fluente-v2';
+const CACHE = 'trilha-fluente-v3';
 const ASSETS = ['./', 'index.html', 'styles.css', 'app.js', 'manifest.webmanifest', 'icon.svg',
   'data/levels-a.js', 'data/levels-b.js', 'data/levels-c.js', 'data/extras.js',
   'data/vocab-1.js', 'data/vocab-1b.js', 'data/vocab-2.js', 'data/vocab-3.js', 'data/vocab-4.js', 'data/vocab-5.js', 'data/vocab-6.js'];
